@@ -12,6 +12,7 @@ var config = require('./config');
 var passport = require('./lib/passport');
 var HttpError = require('./error').HttpError;
 var app = express();
+var port = process.env.PORT || config.get('port');
 
 app.set('main_path', __dirname + path.sep);
 app.set('view engine', 'jade');
@@ -71,7 +72,7 @@ app.use(function httpErrorHandler(err, req, res, next) {
 });
 
 const server = http.createServer(app);
-server.listen(config.get('port'), () => log.info('Express server listening on port ' + config.get('port')));
+server.listen(port, () => log.info('Express server listening on port ' + port));
 
 const io = require('./socket')(server);
 app.set('io', io);
