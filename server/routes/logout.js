@@ -4,7 +4,10 @@ exports.get = function(req, res, next) {
 	var uid = req.user._id;
 	var connectedSockets = io.Users[uid].soketData;
 
-	req.session.destroy(function(err) {
+	req.session.reload(function(err) {
+
+		delete req.session['passport'];
+
 		connectedSockets.forEach(function(scoket, index) {
 			if (scoket.handshake.session.id === sid) {
 				scoket.emit('logout');
@@ -16,6 +19,7 @@ exports.get = function(req, res, next) {
 				delete io.Users[uid];
 			}
 		});
+		req.session.save();
 
 		if (err) {
 			return next(err);

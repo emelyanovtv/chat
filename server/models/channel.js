@@ -9,6 +9,14 @@ var schema = new Schema({
 		type: String,
 		required: true
 	},
+	anonym: {
+		type: Boolean,
+		default: false
+	},
+	encrypted: {
+		type: Boolean,
+		default: false
+	},
 	type: {
 		type: String,
 		enum: ['room', 'user'],
@@ -52,7 +60,8 @@ schema.statics.getChannelInitialData = function(channel) {
 		avatar: '',
 		color: '000',
 		lastMessage: '',
-		total_messages: 0
+		total_messages: 0,
+		encrypted: channel.encrypted
 	};
 };
 
@@ -72,38 +81,38 @@ schema.statics.prepareChannel = function(id, channel, Users) {
 		channel.users.push(id);
 		// Знаю , что плохо передавать глобальный объект , но ничего пока не поделаешь
 		customObject.is_online = Users.hasOwnProperty(userID);
-
-		console.log('prepare.channel');
-		return Promise.all(
-			[
-				User.getUserByID(userID),
-				Message.getUnreadMessagesByChannel(channel._id, id),
-				Message.getLastChannelMessage(channel._id),
-				Message.getMessagesCountByChannel(channel._id)
-			])
-			.then(function(result) {
-				var user = result[0];
-				var unreadMessages = result[1];
-				var lastMessage = result[2] ? result[2].message : '';
-				var totalMessages = result[3] ? result[3] : customObject.total_messages;
-				return Object.assign(customObject, {
-					name: user.username,
-					avatar: user.avatar,
-					color: user.color,
-					message_count: unreadMessages.length,
-					lastMessage: lastMessage,
-					total_messages: totalMessages
+		if (userID) {
+			return Promise.all(
+				[
+					User.getUserByID(userID),
+					Message.getUnreadMessagesByChannel(channel._id, id),
+					Message.getLastChannelMessage(channel._id),
+					Message.getMessagesCountByChannel(channel._id)
+				])
+				.then(function(result) {
+					var user = result[0];
+					var unreadMessages = result[1];
+					var lastMessage = result[2] ? result[2].message : '';
+					var totalMessages = result[3] ? result[3] : customObject.total_messages;
+					return Object.assign(customObject, {
+						name: user.username,
+						avatar: user.avatar,
+						color: user.color,
+						message_count: unreadMessages.length,
+						lastMessage: lastMessage,
+						total_messages: totalMessages
+					});
 				});
-			});
+		}
 	}
 
 	return Promise.resolve(customObject);
 };
 
-schema.statics.getContactsByUserID = function(id, Users) {
+schema.statics.getContactsByUserID = function(id, Users, anonym) {
 	var Channel = this;
 
-	return Channel.find({ users: { $in: [id] } }).then(function(channelsData) {
+	return Channel.find({$and: [{ users: { $in: [id] } }, { anonym: anonym}]}).then(function(channelsData) {
 		if (channelsData.length > 0) {
 			return Promise
 				.all(channelsData.map(function(channel) {

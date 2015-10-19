@@ -8,7 +8,9 @@ class Dialog extends Component {
 		messages: PropTypes.object,
 		user: PropTypes.object,
 		channels: PropTypes.object,
-		fetchChannelMessages: PropTypes.func
+		fetchChannelMessages: PropTypes.func,
+		encryptedMust: PropTypes.bool,
+		encryptString: PropTypes.string
 	}
 
 	constructor(props) {
@@ -63,7 +65,7 @@ class Dialog extends Component {
 	}
 
 	render() {
-		const {messages, channels, user} = this.props;
+		const {messages, channels, user, encryptedMust, encryptString} = this.props;
 		let isOnline = false;
 		const disabled = this.anotherMessagesExist() ? ' messages-container--show' : '';
 		if ((channels.contacts[channels.current] !== undefined) && (channels.contacts[channels.current].is_online === true)) {
@@ -81,7 +83,7 @@ class Dialog extends Component {
 					<hr className="messages-container__start-line"/>
 					{messagesList.map((message, index) => {
 						const isShort = (index > 0 && message.userId === messagesList[index - 1].userId) ? true : false;
-						return <DialogMessage key={message._id} short={isShort} message={message} user={user} channels={channels} />;
+						return <DialogMessage encryptedMust={encryptedMust} encryptString={encryptString} key={message._id} short={isShort} message={message} user={user} channels={channels} />;
 					})}
 				</ul>
 			</div>

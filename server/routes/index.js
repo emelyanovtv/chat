@@ -1,13 +1,20 @@
 
 var checkAuth = require('./../middleware/checkAuth');
+var checkIsAuth = require('./../middleware/checkIsAuth');
 var passport = require('./../lib/passport');
+var p2p = require('./../lib/p2p');
 
 module.exports = function(app) {
 	app.get('/', checkAuth, require('./frontpage').get);
-	app.get('/login', require('./frontpage').get);
-
+	app.get('/login', checkIsAuth, require('./frontpage').get);
+	app.get('/create', require('./frontpage').get);
+	app.post('/create', function(req, res) {
+		p2p.addChat(req.body).then(function() {
+			res.json({ error: null });
+		});
+	});
 	app.post('/login', function(req, res) {
-		passport.authenticate('local', function(err, user) {
+		passport.authenticate('local', {session: true}, function(err, user) {
 			if (req.xhr) {
 				if (err) {
 					return res.json({ error: err.message });
@@ -22,6 +29,8 @@ module.exports = function(app) {
 			}
 		})(req, res);
 	});
+
+	app.get('/chat/:hash/', require('./chat').get);
 
 	app.get('/login-fb', passport.authenticate('facebook', {scope: 'email'}));
 	app.get('/register', require('./frontpage').get);

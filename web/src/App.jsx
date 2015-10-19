@@ -9,14 +9,14 @@ import './components/page.sass';
 
 export default class App extends Component {
 	componentWillMount() {
-		transport.init();
+		transport.init({});
 		store.dispatch(fetchUserData());
 	}
 
 	render() {
 		return (
 			<div className="chat">
-				<Header/>
+				<Header registered="true"/>
 				<Sidebar/>
 				<Main/>
 			</div>

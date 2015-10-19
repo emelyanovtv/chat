@@ -1,13 +1,16 @@
 import React, {Component, PropTypes} from 'react';
 import UserPic from '../user-pic';
 import './input.sass';
+import {encrypt} from '../../text-processor/process';
 
 class Input extends Component {
 	static propTypes = {
 		addMessage: PropTypes.func,
 		channel: PropTypes.string,
 		activeChannelId: PropTypes.string,
-		user: PropTypes.object
+		user: PropTypes.object,
+		encryptedMust: PropTypes.bool,
+		encryptString: PropTypes.string
 	}
 
 	componentDidMount() {
@@ -33,22 +36,34 @@ class Input extends Component {
 		elm.selectionStart = elm.selectionEnd = start + 1;
 	}
 
+	sendMess(text, elem) {
+		if (text.length > 0) {
+			const {addMessage, activeChannelId, user} = this.props;
+			addMessage('text', text, activeChannelId, user._id);
+			elem.value = '';
+		}
+	}
+
 	submitMessage(event) {
 		event.preventDefault();
 		event.stopPropagation();
 
 		const elm = this.refs.messageInput.getDOMNode();
 		const text = elm.value.trim();
-		if (text.length > 0) {
-			const {addMessage, activeChannelId, user} = this.props;
-			addMessage('text', text, activeChannelId, user._id);
-			elm.value = '';
+		const encryptString = (this.props.encryptString === null) ? '' : this.props.encryptString.toString().trim();
+		if (this.props.encryptedMust) {
+			if (encryptString.length === 0) {
+				alert('Encrypted chat must have encrypt string!');
+			} else {
+				this.sendMess(encrypt(text, this.props.encryptString), elm);
+			}
+		} else {
+			this.sendMess(text, elm);
 		}
 	}
 
 	render() {
 		const {user: {avatar, color, isOnline = true}} = this.props;
-
 		return (
 			<div className="dialog-input">
 				<UserPic
