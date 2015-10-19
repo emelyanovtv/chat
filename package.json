@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "prebuild": "npm run clean -s",
-    "start": "npm run server:dev",
+    "start": "npm run server:production",
     "server:dev": "NODE_ENV=develop DEBUG=socket.io* node app.js",
     "server:prod": "NODE_ENV=production node app.js",
     "clean": "rm -rf web/build",
