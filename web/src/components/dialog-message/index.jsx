@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
 import {defaultChannelId} from '../../config';
 import {markdown} from '../../text-processor/process';
+import {decrypt} from '../../text-processor/process';
 import UserPic from '../user-pic';
 import './dialog-message.sass';
 
@@ -10,7 +11,22 @@ class DialogMessage extends Component {
 		user: PropTypes.object,
 		message: PropTypes.object,
 		channels: PropTypes.object,
-		short: PropTypes.bool
+		short: PropTypes.bool,
+		encryptedMust: PropTypes.bool,
+		encryptString: PropTypes.string
+	}
+
+	getMessageObj() {
+		const {message, encryptedMust, encryptString} = this.props;
+		let messageStr = message.message;
+		if ( encryptedMust ) {
+			messageStr = decrypt(messageStr, encryptString);
+		}
+
+		return {
+			message: messageStr,
+			created: message.created
+		};
 	}
 
 	_getUsername() {
@@ -41,7 +57,7 @@ class DialogMessage extends Component {
 	}
 
 	renderShort() {
-		const {message} = this.props;
+		const message = this.getMessageObj();
 		const htmlMessage = {
 			__html: markdown(message.message)
 		};
@@ -59,8 +75,7 @@ class DialogMessage extends Component {
 	}
 
 	renderFull() {
-		const {message} = this.props;
-
+		const message = this.getMessageObj();
 		const htmlMessage = {
 			__html: markdown(message.message)
 		};

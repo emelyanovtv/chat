@@ -12,7 +12,8 @@ import './main.sass';
 	messages: store.messages,
 	channels: store.channels,
 	user: store.user,
-	ui: store.ui
+	ui: store.ui,
+	anonym: store.anonym
 }))
 
 class Main extends Component {
@@ -21,12 +22,17 @@ class Main extends Component {
 		channels: PropTypes.object,
 		messages: PropTypes.object,
 		user: PropTypes.object,
-		ui: PropTypes.object
+		ui: PropTypes.object,
+		anonym: PropTypes.object
 	}
 
 	render() {
-		const {dispatch, user, channels, messages, ui} = this.props;
+		const {dispatch, user, channels, messages, ui, anonym} = this.props;
 		const boundActions = bindActionCreators({addMessage}, dispatch);
+		let encrypted = false;
+		if (channels.current !== null && channels.contacts[channels.current] !== undefined) {
+			encrypted = channels.contacts[channels.current].encrypted;
+		}
 
 		return (
 			<main className="main">
@@ -34,9 +40,13 @@ class Main extends Component {
 						user={user}
 						channels={channels}
 						messages={messages}
+						encryptedMust={encrypted}
+						encryptString={anonym.encryptString}
 						{...bindActionCreators({fetchChannelMessages}, dispatch)} />
 				<Input
 						activeChannelId={this.props.channels.current}
+						encryptedMust={encrypted}
+						encryptString={anonym.encryptString}
 						user={user}
 						{...boundActions} />
 				{ui.videoPanel.active ?

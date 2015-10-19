@@ -2,11 +2,14 @@
   "port": 80,
   "defaultChannel": "1bd3b5a8a7a560e168b3890a",
   "app":{
-    "serverUrl":"http://vanillajs.ru", 
-    "socketOrigin":"http://vanillajs.ru:*"
+    "serverUrl":"http://emelyanovtv-chat.herokuapp.com/",
+    "socketOrigin":"http://emelyanovtv-chat.herokuapp.com:*"
+  },
+  "redis": {
+	"uri": "redis://h:pefa5tp617n70f2gfn4dnefsb5@ec2-54-225-132-156.compute-1.amazonaws.com:10229"
   },
   "mongoose": {
-    "uri": "mongodb://127.0.0.1:27017",
+    "uri": "mongodb://heroku_qg455r13:2lbem99fcjh6q51trv9dapofcg@ds035703.mongolab.com:35703/heroku_qg455r13",
     "options": {
       "server": {
         "socketOptions": {

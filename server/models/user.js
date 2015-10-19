@@ -59,6 +59,10 @@ schema = new Schema(
 			type: Date,
 			default: Date.now
 		},
+		anonymus: {
+			type: Boolean,
+			default: false
+		},
 		authType: {
 			type: [{
 				name: {

@@ -2,8 +2,11 @@
   "port": 3000,
   "defaultChannel": "1bd3b5a8a7a560e168b3890a",
   "app":{
-    "serverUrl":"http://192.168.0.102:3000",
-    "socketOrigin":"http://192.168.0.102:*"
+    "serverUrl":"http://localhost:3000",
+    "socketOrigin":"http://localhost:*"
+  },
+  "redis": {
+	"uri": "redis://127.0.0.1:6379"
   },
   "mongoose": {
     "uri": "mongodb://127.0.0.1:27017",
@@ -21,7 +24,7 @@
     "cookie": {
       "path": "/",
       "httpOnly": true,
-      "maxAge": null
+      "maxAge": 31536000000
     }
   },
   "passport":{

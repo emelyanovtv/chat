@@ -18,12 +18,11 @@ function loadSession(sid) {
 	});
 }
 
-function loadUser(session) {
-	if (!session.passport.user.user_id) {
+function loadUser(userId) {
+	if (!userId) {
 		return Promise.reject();
 	}
-
-	return User.findById(session.passport.user.user_id);
+	return User.findById(userId);
 }
 
 module.exports = function(server) {
@@ -42,17 +41,34 @@ module.exports = function(server) {
 
 	io.use(function(socket, next) {
 		var sid = socket.request.signedCookies[sessionKey];
-
+		var channel;
+		var isAnonym = false;
+		if (socket.handshake.query.query !== undefined && socket.handshake.query.query === 'anonymus') {
+			isAnonym = true;
+		}
 		loadSession(sid)
 			.then(function(session) {
 				socket.handshake.session = session;
 				return session;
 			})
-			.then(loadUser)
+			.then(function(session) {
+				var userId = null;
+				if (session.passport !== undefined && !isAnonym) {
+					userId = session.passport.user.user_id;
+					socket.handshake.channel = session.passport.user.channel;
+				}
+				if (session.anonymus !== undefined && isAnonym) {
+					userId = session.anonymus.user_id;
+					socket.handshake.channel = session.anonymus.channel;
+				}
+
+
+
+				return loadUser(userId);
+			})
 			.then(function(user) {
-				var channel;
 				var defaultChannel;
-				channel = socket.handshake.session.passport.user.channel;
+				channel = socket.handshake.channel;
 				defaultChannel = config.get('defaultChannel');
 				socket.handshake.user = user;
 				// Если пользователь уже присутствует
@@ -71,7 +87,7 @@ module.exports = function(server) {
 				}
 
 				Channel
-					.getContactsByUserID(user._id, Users)
+					.getContactsByUserID(user._id, Users, isAnonym)
 					.then(function(contacts) {
 						Users[user._id].contacts = contacts;
 						// если мы удалили канал и он каким-то образом остался в нем

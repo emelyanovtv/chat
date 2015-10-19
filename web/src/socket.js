@@ -7,8 +7,8 @@ import {setUserId} from './actions/user';
 import {setError} from './actions/ui';
 
 const transport = {
-	init: function() {
-		transport.socket = io.connect({transports: ['websocket', 'polling']});
+	init: function(query) {
+		transport.socket = io.connect({transports: ['websocket', 'polling'], query});
 		transport.bindActionsToSocketEvents();
 	},
 

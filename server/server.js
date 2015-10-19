@@ -30,7 +30,7 @@ app.use(session({
 	resave: false,
 	cookie: config.get('session:cookie'),
 	store: require('./lib/database/sessionStore'),
-	saveUninitialized: false
+	saveUninitialized: true
 }));
 
 app.use(passport.initialize());

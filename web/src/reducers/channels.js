@@ -17,7 +17,8 @@ const defaultChannelsData = {
 			type: 'room',
 			user: 'Lobby',
 			lastMessage: '',
-			total_messages: 0
+			total_messages: 0,
+			encrypted: false
 		}
 	}
 };
