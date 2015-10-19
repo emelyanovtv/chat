@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import createHash from './helper';
 import serialize from 'form-serialize';
 import {sendFormData} from '../../utils/request';
-import cx from 'classnames';
 import './index.sass';
 
 class Create extends Component {

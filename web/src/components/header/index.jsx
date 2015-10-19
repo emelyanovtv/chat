@@ -6,7 +6,7 @@ class Header extends Component {
 	static propTypes = {
 		registered: PropTypes.string
 	}
-s
+
 	render() {
 		let Logout = '';
 		if (this.props.registered === 'true') {

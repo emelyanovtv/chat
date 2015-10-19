@@ -16,6 +16,19 @@ class DialogMessage extends Component {
 		encryptString: PropTypes.string
 	}
 
+	getMessageObj() {
+		const {message, encryptedMust, encryptString} = this.props;
+		let messageStr = message.message;
+		if ( encryptedMust ) {
+			messageStr = decrypt(messageStr, encryptString);
+		}
+
+		return {
+			message: messageStr,
+			created: message.created
+		};
+	}
+
 	_getUsername() {
 		const {channels: {contacts}, message, user} = this.props;
 		if (!contacts[message.channelId] || message.channelId.toString() === defaultChannelId) {
@@ -41,19 +54,6 @@ class DialogMessage extends Component {
 				avatar={avatar}
 				color={color} />
 		);
-	}
-
-	getMessageObj() {
-		const {message, encryptedMust, encryptString} = this.props;
-		let messageStr = message.message;
-		if ( encryptedMust ) {
-			messageStr = decrypt(messageStr, encryptString);
-		}
-
-		return {
-			message: messageStr,
-			created: message.created
-		};
 	}
 
 	renderShort() {
