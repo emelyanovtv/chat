@@ -5,6 +5,9 @@
     "serverUrl":"http://localhost:3000",
     "socketOrigin":"http://localhost:*"
   },
+  "redis": {
+	"uri": "redis://127.0.0.1:6379"
+  },
   "mongoose": {
     "uri": "mongodb://127.0.0.1:27017",
     "options": {
