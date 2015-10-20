@@ -3,7 +3,14 @@ var Channel = require('./../models/channel').Channel;
 var User = require('./../models/user').User;
 var sessionStore = require('./../lib/database/sessionStore');
 var config = require('./../config');
-// нужно всю логику перенсти сюда
+/*
+ * проверка на существование чата
+ * нормальное возвращение ошибок
+ * временные отрезки и удаление чатов и соббщений
+ * звуковые сообщения
+ * нормальная работа ошибок
+ * тесты
+ */
 var p2p = {
 	/**
 	 * request {Object}
