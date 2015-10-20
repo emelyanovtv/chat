@@ -47,7 +47,6 @@ class Input extends Component {
 	submitMessage(event) {
 		event.preventDefault();
 		event.stopPropagation();
-
 		const elm = this.refs.messageInput.getDOMNode();
 		const text = elm.value.trim();
 		const encryptString = (this.props.encryptString === null) ? '' : this.props.encryptString.toString().trim();
@@ -55,7 +54,9 @@ class Input extends Component {
 			if (encryptString.length === 0) {
 				alert('Encrypted chat must have encrypt string!');
 			} else {
-				this.sendMess(encrypt(text, this.props.encryptString), elm);
+				if (text.length) {
+					this.sendMess(encrypt(text, this.props.encryptString), elm);
+				}
 			}
 		} else {
 			this.sendMess(text, elm);

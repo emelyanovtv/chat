@@ -11,7 +11,13 @@ class Create extends Component {
 
 	constructor() {
 		super();
-		this.state = {error: null, isEncrypted: 0, hash: createHash()};
+		this.options = [
+			{name: 'none', value: 'none'},
+			{name: '1 minute', value: 60},
+			{name: '1 day', value: 86400},
+			{name: '1 week', value: 604800}
+		];
+		this.state = {error: null, isEncrypted: 0, hash: createHash(), temporary: 'none'};
 	}
 
 	onSubmit(event) {
@@ -30,7 +36,6 @@ class Create extends Component {
 			});
 	}
 
-
 	handleChangeCheckbox() {
 		this.state.isEncrypted = !this.state.isEncrypted;
 		this.setState(this.state);
@@ -44,29 +49,45 @@ class Create extends Component {
 
 	renderError() {
 		return (
-			<div className="login-form__error">{this.state.error}</div>
+			<div className="create-form__error">{this.state.error}</div>
+		);
+	}
+
+	renderOption(value, name) {
+		return (
+			<option value={value}>{name}</option>
 		);
 	}
 
 	render() {
+		const options = [];
+		const _t = this;
+		this.options.forEach(function(option) {
+			options.push(_t.renderOption(option.value, option.name));
+		});
 		return (
-			<form className="login-form" ref="form" onSubmit={::this.onSubmit} action="." method="POST">
-				<div className="login-form__header">
+			<form className="create-form" ref="form" onSubmit={::this.onSubmit} action="." method="POST">
+				<div className="create-form__header">
 					<h1>Create p2p chat</h1>
 				</div>
-				<div className="login-form__content">
+				<div className="create-form__content">
 					{this.state.error ? this.renderError() : ''}
 
-					<p className="login-form__field">
+					<p className="create-form__field">
 						<label>Your hash</label>
 						<input ref="hash" type="text" name="hash" value={this.state.hash}/>
 					</p>
-					<p className="login-form__field">
+					<p className="create-form__field">
 						<label>Is Encrypted</label>
 						<input ref="isEncrypted" name="isEncrypted" type="checkbox" value="1" onChange={::this.handleChangeCheckbox}/>
 					</p>
-
-					<button className="login-form__submit" type="submit">Create</button>
+					<p className="create-form__field">
+						<label>Temporary</label>
+						<select onChange={::this.handleChange} name="temporary" ref="temporary">
+							{options}
+						</select>
+					</p>
+					<button className="create-form__submit" type="submit">Create</button>
 				</div>
 			</form>
 		);

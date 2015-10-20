@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import './contactsearch.sass';
+import './anonymencrypt.sass';
 
 class AnonymEncryptField extends Component {
 
@@ -20,13 +20,13 @@ class AnonymEncryptField extends Component {
 
 	render() {
 		return (
-			<div className="contacts-filter">
+			<div className="anonym-hash">
 				<input
 					ref="input"
-					className="contacts-filter__input"
-					placeholder="add ecncrypt/decrypt value"
+					className="anonym-hash__input"
+					placeholder="add ecncrypt/decrypt string"
 					type="text" />
-				<span onClick={::this._setEncrypted} className="contacts-filter__close">Ok</span>
+				<span onClick={::this._setEncrypted} className="anonym-hash__close">Ok</span>
 			</div>
 		);
 	}

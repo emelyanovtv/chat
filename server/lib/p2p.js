@@ -1,16 +1,10 @@
 var redis = require('./redisclient');
 var Channel = require('./../models/channel').Channel;
+var Message = require('./../models/message').Message;
 var User = require('./../models/user').User;
 var sessionStore = require('./../lib/database/sessionStore');
 var config = require('./../config');
-/*
- * проверка на существование чата
- * нормальное возвращение ошибок
- * временные отрезки и удаление чатов и соббщений
- * звуковые сообщения
- * нормальная работа ошибок
- * тесты
- */
+
 var p2p = {
 	/**
 	 * request {Object}
@@ -30,20 +24,7 @@ var p2p = {
 		if ( data.isEncrypted !== undefined && data.isEncrypted.toString() === '1' ) {
 			encrypted = true;
 		}
-		var newChannelObj = {
-			name: data.hash,
-			encrypted: encrypted,
-			anonym: true,
-			type: 'user',
-			users: []
-		};
-
-		var newChannel = new Channel(newChannelObj);
-		return newChannel.save().
-			then(function(channel) {
-				data.channel = channel._id;
-				redis.set(data.hash, JSON.stringify(data));
-			});
+		return this.createAnonymusChannel(data, encrypted);
 	},
 	/**
 	 * @param hash
@@ -60,15 +41,65 @@ var p2p = {
 		return JSON.parse(str);
 	},
 	/**
+	 * @param data {Object}
+	 * @param encrypted {String}
+	 * @returns {Promise.<T>}
+	 */
+	createAnonymusChannel: function(data, encrypted) {
+		var temporaryVal = parseInt(data.temporary);
+		var temporary = !isNaN(temporaryVal) && temporaryVal > 0;
+		var promise;
+		var newChannelObj = {
+			name: data.hash,
+			encrypted: encrypted,
+			anonym: true,
+			temporary: temporary,
+			type: 'user',
+			users: []
+		};
+
+		if (temporary) {
+			newChannelObj.expireAt = (parseInt((+new Date) / 1000) + temporaryVal).toString();
+		}
+
+		var newChannel = new Channel(newChannelObj);
+		return newChannel.save().
+			then(function(channel) {
+				data.channel = channel._id;
+				if (temporary) {
+					promise = redis.multi()
+						.set(data.hash, JSON.stringify(data))
+						.expire(data.hash, temporaryVal)
+						.exec();
+				} else {
+					promise = redis.set(data.hash, JSON.stringify(data));
+				}
+
+				return promise;
+			});
+	},
+	/**
 	 * @param hash
 	 * @param req
 	 */
 	prepareChat: function(hash, req) {
 		var _this = this;
+		var resp = {status: false, error: null};
 		this.req = req;
 		return this.getChat(hash).
 			then(function(data) {
-				return _this.stringToJson(data);
+				if (!data) {
+					return Channel.findOne({name: hash}).
+						then(function(channel) {
+							if (channel !== null) {
+								Message.find({ channelId: { $in: [channel._id] } }).remove(function(err, mess) {});
+								channel.remove(function(err, mess) {});
+							}
+							return Promise.reject(new Error('This Anonymus chat not exist'));
+						});
+				} else {
+					return _this.stringToJson(data);
+				}
 			}).
 			then(function(jsonData) {
 				_this.redisData = jsonData;
@@ -99,11 +130,12 @@ var p2p = {
 				return Channel.update({_id: _this.redisData.channel}, { $addToSet: { users: user.user_id } });
 			}).
 			then(function() {
-				return true;
+				resp.status = true;
+				return resp;
 			}).
 			catch(function(err) {
-				console.log(err);
-				return false;
+				resp.error = err;
+				return resp;
 			});
 	},
 	reloadSession: function(name, object) {

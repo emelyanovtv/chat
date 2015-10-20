@@ -95,6 +95,12 @@ export function addContact(contact) {
 	};
 }
 
+export function deleteChannelAnonym(id) {
+	return () => {
+		transport.socket.emit('c.channel.delete_anonym', {id});
+	};
+}
+
 export function deleteChannel(id, num) {
 	return () => {
 		transport.socket.emit('c.channel.delete', {id, num});

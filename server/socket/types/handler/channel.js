@@ -48,6 +48,14 @@ var Channels = inherit({
 		},
 		{
 			// обработчик удалет канал
+			name: channelTypes.DELETE_CHANNEL_ANONYM,
+			callback: function(channel) {
+				Channel.findOne({_id: channel.id}).remove(function(err, mess) {});
+				Message.find({ channelId: { $in: [channel.id] } }).remove(function(err, mess) {});
+			}
+		},
+		{
+			// обработчик удалет канал
 			name: channelTypes.DELETE_CHANNEL,
 			callback: function(channel) {
 				var userData = this._data;
