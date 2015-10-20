@@ -2,7 +2,7 @@
   "port": 80,
   "defaultChannel": "1bd3b5a8a7a560e168b3890a",
   "app":{
-    "serverUrl":"http://emelyanovtv-chat.herokuapp.com/",
+    "serverUrl":"http://emelyanovtv-chat.herokuapp.com",
     "socketOrigin":"http://emelyanovtv-chat.herokuapp.com:*"
   },
   "redis": {
