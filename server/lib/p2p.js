@@ -46,7 +46,7 @@ var p2p = {
 	 * @returns {Promise.<T>}
 	 */
 	createAnonymusChannel: function(data, encrypted) {
-		var temporaryVal = parseInt(data.temporary);
+		var temporaryVal = parseInt(data.temporary, 10);
 		var temporary = !isNaN(temporaryVal) && temporaryVal > 0;
 		var promise;
 		var newChannelObj = {
@@ -59,7 +59,7 @@ var p2p = {
 		};
 
 		if (temporary) {
-			newChannelObj.expireAt = (parseInt((+new Date) / 1000) + temporaryVal).toString();
+			newChannelObj.expireAt = (parseInt((+new Date) / 1000, 10) + temporaryVal).toString();
 		}
 
 		var newChannel = new Channel(newChannelObj);

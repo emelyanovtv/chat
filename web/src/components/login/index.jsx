@@ -58,6 +58,9 @@ class Login extends Component {
 					<p className="login-form__field">
 						<a href="/login-fb">Facebook</a>
 					</p>
+					<p className="login-form__field">
+						<a href="/login-vk">Vkontakte</a>
+					</p>
 					<p>
 						<Link to={'/create'}>Create p2p</Link>
 					</p>
