@@ -59,7 +59,7 @@ module.exports = function(app) {
 			// this function will not be called.
 		});
 
-	app.get('/login-vk-callback',
+	app.get('/login-vk-callback*',
 		passport.authenticate('vk', {
 			successRedirect: '/',
 			failureRedirect: '/login'
