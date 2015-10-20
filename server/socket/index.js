@@ -62,8 +62,6 @@ module.exports = function(server) {
 					socket.handshake.channel = session.anonymus.channel;
 				}
 
-
-
 				return loadUser(userId);
 			})
 			.then(function(user) {

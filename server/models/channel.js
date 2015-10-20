@@ -17,6 +17,14 @@ var schema = new Schema({
 		type: Boolean,
 		default: false
 	},
+	temporary: {
+		type: Boolean,
+		default: false
+	},
+	expireAt: {
+		type: String,
+		default: null
+	},
 	type: {
 		type: String,
 		enum: ['room', 'user'],
@@ -61,7 +69,9 @@ schema.statics.getChannelInitialData = function(channel) {
 		color: '000',
 		lastMessage: '',
 		total_messages: 0,
-		encrypted: channel.encrypted
+		encrypted: channel.encrypted,
+		temporary: channel.temporary,
+		expireAt: channel.expireAt
 	};
 };
 

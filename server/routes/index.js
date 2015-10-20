@@ -9,8 +9,12 @@ module.exports = function(app) {
 	app.get('/login', checkIsAuth, require('./frontpage').get);
 	app.get('/create', require('./frontpage').get);
 	app.post('/create', function(req, res) {
-		p2p.addChat(req.body).then(function() {
-			res.json({ error: null });
+		p2p.addChat(req.body).then(function(status) {
+			if (status === 'OK' || (status instanceof Array && status[0] === 'OK')) {
+				res.json({ error: null });
+			} else {
+				res.json({ error: true });
+			}
 		});
 	});
 	app.post('/login', function(req, res) {

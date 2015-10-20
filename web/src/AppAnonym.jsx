@@ -26,15 +26,21 @@ class AppAnonym extends Component {
 	render() {
 		const {channels} = this.props;
 		let isEncrypted = false;
+		let isTemporary = false;
+		let current = null;
+		let expireAt = null;
 		if (channels.contacts && channels.current !== null) {
 			if (channels.contacts[channels.current] !== undefined) {
+				current = channels.current;
 				isEncrypted = channels.contacts[channels.current].encrypted;
+				isTemporary = channels.contacts[channels.current].temporary;
+				expireAt = channels.contacts[channels.current].expireAt;
 			}
 		}
 		return (
 			<div className="chat">
 				<Header registered="false"/>
-				<SidebarAnonym dispatch={this.props.dispatch} encrypted={isEncrypted}/>
+				<SidebarAnonym dispatch={this.props.dispatch} encrypted={isEncrypted} temporary={isTemporary} expire={expireAt} current={current}/>
 				<Main/>
 			</div>
 		);
