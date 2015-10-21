@@ -4,6 +4,7 @@ import {defaultChannelId} from '../../config';
 import {markdown} from '../../text-processor/process';
 import {decrypt} from '../../text-processor/process';
 import UserPic from '../user-pic';
+import _assign from 'lodash/object/assign';
 import './dialog-message.sass';
 
 class DialogMessage extends Component {
@@ -42,7 +43,7 @@ class DialogMessage extends Component {
 		if (!contacts[message.channelId]) {
 			return {};
 		}
-		return (user._id.toString() === message.userId.toString()) ? Object.assign(user, {'is_online': true}) : contacts[message.channelId];
+		return (user._id.toString() === message.userId.toString()) ? _assign(user, {'is_online': true}) : contacts[message.channelId];
 	}
 
 	renderUserPic() {

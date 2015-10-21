@@ -1,6 +1,6 @@
 
-var checkAuth = require('./../middleware/checkAuth');
-var checkIsAuth = require('./../middleware/checkIsAuth');
+var checkAuth = require('./../middleware/express/checkAuth');
+var checkIsAuth = require('./../middleware/express/checkIsAuth');
 var passport = require('./../lib/passport');
 var p2p = require('./../lib/p2p');
 

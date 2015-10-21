@@ -1,11 +1,11 @@
+var manager = require('./../socket/manager');
+
 exports.get = function(req, res, next) {
-	var io = req.app.get('io');
 	var sid = req.session.id;
 	var uid = req.user._id;
-	var connectedSockets = io.Users[uid].soketData;
+	var connectedSockets = manager.users.get(uid).sockets;
 
 	req.session.reload(function(err) {
-
 		delete req.session['passport'];
 
 		connectedSockets.forEach(function(scoket, index) {
@@ -16,7 +16,7 @@ exports.get = function(req, res, next) {
 			}
 			// удаление пользователя из глобального скопа если нет сокетов с другими сессиями
 			if (connectedSockets.length === 0) {
-				delete io.Users[uid];
+				manager.users.remove(uid);
 			}
 		});
 		req.session.save();

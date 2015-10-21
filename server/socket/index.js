@@ -1,111 +1,50 @@
-var cookieParser = require('cookie-parser');
-var cookie = require('cookie');
 var config = require('./../config');
-var sessionStore = require('./../lib/database/sessionStore');
-var User = require('./../models/user').User;
-var Channel = require('./../models/channel').Channel;
-var Users = {}; // Глобальный объект с пользователями и подключенными сокетами
-
-function loadSession(sid) {
-	return new Promise(function(resolve, reject) {
-		sessionStore.load(sid, function(err, session) {
-			if (err) {
-				// no arguments => no session
-				reject('Can\'t load session');
-			}
-			resolve(session);
-		});
-	});
-}
-
-function loadUser(userId) {
-	if (!userId) {
-		return Promise.reject();
-	}
-	return User.findById(userId);
-}
+var middleware = require('../middleware/socket');
+var models = require('../models');
+var manager = require('./manager');
+var DEFAULT_CHANNEL_ID = config.get('defaultChannel');
 
 module.exports = function(server) {
-	var secret = config.get('session:secret');
-	var sessionKey = config.get('session:key');
 	var io = require('socket.io').listen(server);
 
 	io.set('origins', config.get('app:socketOrigin'));
+	io.use(middleware.cookie);
+	io.use(middleware.loadSession);
+	io.use(middleware.loadUser);
 
 	io.use(function(socket, next) {
-		var req = socket.request;
-		req.cookies = cookie.parse(req.headers.cookie);
-		req.signedCookies = cookieParser.signedCookies(req.cookies, secret);
-		next();
-	});
-
-	io.use(function(socket, next) {
-		var sid = socket.request.signedCookies[sessionKey];
-		var channel;
-		var isAnonym = false;
-		if (socket.handshake.query.query !== undefined && socket.handshake.query.query === 'anonymus') {
-			isAnonym = true;
+		var userId = socket.handshake.user._id;
+		var user = manager.users.get(userId);
+		var channel = socket.handshake.channel;
+		if (user) {
+			user.updateSockets();
+			user.sockets.push(socket);
+		} else {
+			user = manager.users.create(userId, {
+				userData: socket.handshake.user,
+				socket: socket,
+				channel: channel || DEFAULT_CHANNEL_ID
+			});
 		}
-		loadSession(sid)
-			.then(function(session) {
-				socket.handshake.session = session;
-				return session;
-			})
-			.then(function(session) {
-				var userId = null;
-				if (session.passport !== undefined && !isAnonym) {
-					userId = session.passport.user.user_id;
-					socket.handshake.channel = session.passport.user.channel;
+		// is anonym
+		models.Channel
+			.getContactsByUserID(userId, socket.handshake.user.anonymus)
+			.then(function(contacts) {
+				user.contacts = contacts;
+				if (!user.contacts.hasOwnProperty(channel)) {
+					user.channel = DEFAULT_CHANNEL_ID;
 				}
-				if (session.anonymus !== undefined && isAnonym) {
-					userId = session.anonymus.user_id;
-					socket.handshake.channel = session.anonymus.channel;
-				}
-
-				return loadUser(userId);
-			})
-			.then(function(user) {
-				var defaultChannel;
-				channel = socket.handshake.channel;
-				defaultChannel = config.get('defaultChannel');
-				socket.handshake.user = user;
-				// Если пользователь уже присутствует
-				if (Users.hasOwnProperty(user._id) && Users[user._id].soketData.length) {
-					// проверяем какие сокеты уже отвалились
-					// удаляем их
-					Users[user._id].soketData = Users[user._id].soketData.filter(function(item) {
-						return !item.disconnected;
-					});
-					// добавляем текущее соединение
-					Users[user._id].soketData.push(socket);
-				} else {
-					// Если пользователя нет, то добавляем его
-					const putData = {userData: user, soketData: [socket], channel: channel || defaultChannel};
-					Users[user._id] = putData;
-				}
-
-				Channel
-					.getContactsByUserID(user._id, Users, isAnonym)
-					.then(function(contacts) {
-						Users[user._id].contacts = contacts;
-						// если мы удалили канал и он каким-то образом остался в нем
-						if (!Users[user._id].contacts.hasOwnProperty(channel)) {
-							Users[user._id].channel = defaultChannel;
-						}
-						next();
-					});
+				next();
 			})
 			.catch(next);
 	});
 
 	io.on('connection', function socketConnectionHandler(socket) {
-		require('./types/user')(socket, Users);
-		require('./types/channel')(socket, Users);
+		require('./types/user')(socket);
+		require('./types/channel')(socket);
 		// генерирую событие списка комнат getContsctsList
 		// Обработка пользовательских событий
 	});
-
-	io.Users = Users;
 
 	return io;
 };

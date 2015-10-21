@@ -1,6 +1,7 @@
-var MessageType = require('./messagetype').MessageType;
+
 var mongoose = require('./../lib/database/mongoose');
 var Schema = mongoose.Schema;
+var MessageType = require('./Messagetype');
 
 // схема модели Сообщений
 var schema = new Schema({
@@ -100,4 +101,4 @@ schema.statics.addNew = function(message) {
 		});
 };
 
-exports.Message = mongoose.model('Message', schema);
+module.exports = mongoose.model('Message', schema);

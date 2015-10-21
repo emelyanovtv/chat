@@ -1,26 +1,8 @@
 var crypto = require('crypto');
-var util = require('util');
-var mongoose = require('./../lib/database/mongoose');
+var mongoose = require('../lib/database/mongoose');
 var Schema = mongoose.Schema;
+var AuthError = require('../error').AuthError;
 
-var schema;
-
-// <editor-fold desc='ошибка авторизации'>
-function AuthError(message) {
-	Error.apply(this, arguments);
-	Error.captureStackTrace(this, AuthError);
-
-	this.message = message;
-}
-
-util.inherits(AuthError, Error);
-
-AuthError.prototype.name = 'AuthError';
-
-exports.AuthError = AuthError;
-// </editor-fold>
-
-// схема модели пользователя
 schema = new Schema(
 	{
 		username: {
@@ -78,6 +60,13 @@ schema = new Schema(
 	}
 );
 
+if (!schema.options.toObject) schema.options.toObject = {};
+schema.options.toObject.transform = function(doc, ret) {
+	delete ret.hashedPassword;
+	delete ret.salt;
+	delete ret.__v;
+};
+
 schema.methods.encryptPassword = function(password) {
 	return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
 };
@@ -120,13 +109,6 @@ schema.statics.findByParams = function(username, email) {
 
 schema.statics.authorizeSocial = function(userData) {
 	var User = this;
-	/**
-	 * 1. Получить пользователя с таким username из базы данных
-	 * 2. Такой пользователь найден?
-	 *      Да - сверить был ли он уже авторизован через сервис
-	 *      Нет - создаем нового
-	 * 3. Авторизация успешна
-	 */
 	return User.findOne({email: userData.email}).
 		then(function(user) {
 			var returnUser;
@@ -150,25 +132,18 @@ schema.statics.getUserByID = function(id) {
 };
 
 schema.statics.authorize = function(username, password) {
-	/**
-	 * 1. Получить пользователя с таким username из базы данных
-	 * 2. Такой пользователь найден?
-	 *      Да - сверить пароль вызовом user.checkPassword
-	 *      Нет - ответ ошибки
-	 * 3. Авторизация успешна?
-	 */
 	var User = this;
 
-	return User.findOne({username: username}).
-		then(function(user) {
+	return User.findOne({username: username})
+		.then(function(user) {
 			if (user) {
 				if (user.checkPassword(password)) {
 					return user;
 				}
 			}
 
-			return Promise.reject(new AuthError('Пароль или логин не верен'));
+			return Promise.reject(new AuthError('Login or password is incorrect'));
 		});
 };
 
-exports.User = mongoose.model('User', schema);
+module.exports = mongoose.model('User', schema);
