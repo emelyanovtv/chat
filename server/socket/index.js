@@ -13,7 +13,7 @@ module.exports = function(server) {
 	io.use(middleware.loadUser);
 
 	io.use(function(socket, next) {
-		if(socket.handshake.user) {
+		if (socket.handshake.user) {
 			var userId = socket.handshake.user._id;
 			var user = manager.users.get(userId);
 			var channel = socket.handshake.channel;
