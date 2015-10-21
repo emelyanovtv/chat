@@ -13,30 +13,35 @@ module.exports = function(server) {
 	io.use(middleware.loadUser);
 
 	io.use(function(socket, next) {
-		var userId = socket.handshake.user._id;
-		var user = manager.users.get(userId);
-		var channel = socket.handshake.channel;
-		if (user) {
-			user.updateSockets();
-			user.sockets.push(socket);
-		} else {
-			user = manager.users.create(userId, {
-				userData: socket.handshake.user,
-				socket: socket,
-				channel: channel || DEFAULT_CHANNEL_ID
-			});
+		if(socket.handshake.user) {
+			var userId = socket.handshake.user._id;
+			var user = manager.users.get(userId);
+			var channel = socket.handshake.channel;
+			if (user) {
+				user.updateSockets();
+				user.sockets.push(socket);
+			} else {
+				user = manager.users.create(userId, {
+					userData: socket.handshake.user,
+					socket: socket,
+					channel: channel || DEFAULT_CHANNEL_ID
+				});
+			}
+			// is anonym
+			models.Channel
+				.getContactsByUserID(userId, socket.handshake.user.anonymus)
+				.then(function(contacts) {
+					user.contacts = contacts;
+					if (!user.contacts.hasOwnProperty(channel)) {
+						user.channel = DEFAULT_CHANNEL_ID;
+					}
+					next();
+				})
+				.catch(next);
 		}
-		// is anonym
-		models.Channel
-			.getContactsByUserID(userId, socket.handshake.user.anonymus)
-			.then(function(contacts) {
-				user.contacts = contacts;
-				if (!user.contacts.hasOwnProperty(channel)) {
-					user.channel = DEFAULT_CHANNEL_ID;
-				}
-				next();
-			})
-			.catch(next);
+
+		next(new Error('not fined!'));
+
 	});
 
 	io.on('connection', function socketConnectionHandler(socket) {
