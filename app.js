@@ -9,7 +9,7 @@ var watchIgnorePatterns = [
 ];
 
 var child = new(forever.Monitor)('./server/server.js', {
-	'silent': process.env.NODE_ENV !== 'develop',
+	'silent': false,
 	'pidFile': 'server/pids/app.pid',
 	'watch': true,
 	'watchDirectory': './',
