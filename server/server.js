@@ -10,7 +10,6 @@ var errorhandler = require('errorhandler');
 var log = require('./lib/log')(module);
 var config = require('./config');
 var passport = require('./lib/passport');
-var HttpError = require('./error').HttpError;
 var app = express();
 var port = process.env.PORT || config.get('port');
 
@@ -37,8 +36,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(require('./middleware/sendHttpError'));
-app.use(require('./middleware/loadUser'));
+app.use(require('./middleware/express/loadUser'));
 app.use(compression());
 
 // роуты приложения
@@ -47,6 +45,7 @@ app.use(express.static(path.join(__dirname, '/../web/build/')));
 // passport init
 
 // "обработчик ошибок"
+app.use(require('./middleware/express/sendHttpError'));
 app.use(function httpErrorHandler(err, req, res, next) {
 	var error = err;
 	if (typeof error === 'number') {

@@ -1,4 +1,4 @@
-var User = require('./../models/user').User;
+var User = require('./../models/User');
 var passport = require('./../lib/passport');
 
 exports.post = function(req, res, next) {

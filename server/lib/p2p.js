@@ -1,7 +1,5 @@
 var redis = require('./redisclient');
-var Channel = require('./../models/channel').Channel;
-var Message = require('./../models/message').Message;
-var User = require('./../models/user').User;
+var models = require('./../models');
 var sessionStore = require('./../lib/database/sessionStore');
 var config = require('./../config');
 
@@ -62,7 +60,7 @@ var p2p = {
 			newChannelObj.expireAt = (parseInt((+new Date) / 1000, 10) + temporaryVal).toString();
 		}
 
-		var newChannel = new Channel(newChannelObj);
+		var newChannel = new models.Channel(newChannelObj);
 		return newChannel.save().
 			then(function(channel) {
 				data.channel = channel._id;
@@ -89,10 +87,10 @@ var p2p = {
 		return this.getChat(hash).
 			then(function(data) {
 				if (!data) {
-					return Channel.findOne({name: hash}).
+					return models.Channel.findOne({name: hash}).
 						then(function(channel) {
 							if (channel !== null) {
-								Message.find({ channelId: { $in: [channel._id] } }).remove(function(err, mess) {});
+								models.Message.find({ channelId: { $in: [channel._id] } }).remove(function(err, mess) {});
 								channel.remove(function(err, mess) {});
 							}
 							return Promise.reject(new Error('This Anonymus chat not exist'));
@@ -127,7 +125,7 @@ var p2p = {
 				}
 			}).
 			then(function(user) {
-				return Channel.update({_id: _this.redisData.channel}, { $addToSet: { users: user.user_id } });
+				return models.Channel.update({_id: _this.redisData.channel}, { $addToSet: { users: user.user_id } });
 			}).
 			then(function() {
 				resp.status = true;
@@ -172,7 +170,7 @@ var p2p = {
 		var email = name + '@' + name + '.com';
 		var username = name;
 		var password = Math.random().toString();
-		user = new User(
+		user = new models.User(
 			{
 				username: username,
 				password: password,
