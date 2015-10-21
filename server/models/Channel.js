@@ -89,7 +89,7 @@ schema.statics.prepareChannel = function(id, channel) {
 		channel.users.splice(channel.users.indexOf(id), 1);
 		userID = customObject.user = channel.users[0];
 		channel.users.push(id);
-		customObject.is_online = manager.users.get(userID) ? true : false;
+		customObject.is_online = manager.users.has(userID);
 
 		return Promise.all(
 			[
