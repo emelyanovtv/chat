@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import UserPic from '../user-pic';
+import Speech from '../speech';
 import './input.sass';
 import {encrypt} from '../../text-processor/process';
 
@@ -13,6 +14,11 @@ class Input extends Component {
 		encryptString: PropTypes.string
 	}
 
+	constructor() {
+		super();
+		this.state = {area: null};
+	}
+
 	componentDidMount() {
 		this.refs.messageInput.getDOMNode().addEventListener('keydown', event => {
 			if (event.keyCode === 13) {
@@ -23,6 +29,7 @@ class Input extends Component {
 				}
 			}
 		});
+		this.setState({area: this.refs.messageInput.getDOMNode()}); /* eslint react/no-did-mount-set-state: 0 */
 	}
 
 	insertNewline(event) {
@@ -65,6 +72,10 @@ class Input extends Component {
 
 	render() {
 		const {user: {avatar, color, isOnline = true}} = this.props;
+		let speech = '';
+		if ('webkitSpeechRecognition' in window) {
+			speech = <Speech area={this.state.area}/>;
+		}
 		return (
 			<div className="dialog-input">
 				<UserPic
@@ -72,7 +83,7 @@ class Input extends Component {
 					avatar={avatar}
 					color={color}/>
 				<textarea ref="messageInput" className="dialog-input__textarea"></textarea>
-				<a className="dialog-input__add-button" href="#">+</a>
+				<h4 className="dialog-input__record-button">{speech}</h4>
 				<button onClick={this.submitMessage.bind(this)} className="dialog-input__send-button" type="submit">Send</button>
 			</div>
 		);
