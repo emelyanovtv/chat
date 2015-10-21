@@ -54,7 +54,7 @@ var p2p = {
 			encrypted: encrypted,
 			anonym: true,
 			temporary: temporary,
-			type: 'user',
+			type: 'room',
 			users: []
 		};
 

@@ -65,7 +65,7 @@ schema.statics.getChannelInitialData = function(channel) {
 		name: channel.name,
 		is_online: false,
 		message_count: 0,
-		avatar: '',
+		avatar: '/img/avatar-1.png',
 		color: '000',
 		lastMessage: '',
 		total_messages: 0,

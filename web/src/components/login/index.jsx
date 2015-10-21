@@ -62,7 +62,7 @@ class Login extends Component {
 						<a href="/login-vk">Vkontakte</a>
 					</p>
 					<p>
-						<Link to={'/create'}>Create p2p</Link>
+						<Link to={'/create'}>Create anonymus chat(no register)</Link>
 					</p>
 
 					<button className="login-form__submit" type="submit">Login</button>
