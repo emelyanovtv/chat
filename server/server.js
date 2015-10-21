@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var errorhandler = require('errorhandler');
+var HttpError = require('./error').HttpError;
 var log = require('./lib/log')(module);
 var config = require('./config');
 var passport = require('./lib/passport');
@@ -35,6 +36,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 app.use(require('./middleware/express/loadUser'));
 app.use(compression());
