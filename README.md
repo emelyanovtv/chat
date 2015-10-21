@@ -2,10 +2,8 @@
 
 ### VanillaJS Team
 
-* address: http://vjs.cloudapp.net/
+* address: http://emelyanovtv-chat.herokuapp.com/
 
 * wiki: https://github.com/VanillaJs/chat/wiki
-
-* build: `./build/sh` -> http://localhost:3000/
  
 
