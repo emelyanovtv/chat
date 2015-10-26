@@ -54,7 +54,7 @@ schema.statics.findOrCreate = function(type, userCreateId, userAddId) {
 			});
 	}
 
-	return Promise.resolve(newChannel);
+	return Promise.reject('Channel not exsist and not created!');
 };
 
 schema.statics.getChannelInitialData = function(channel) {
