@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import UiError from '../ui-error';
 import cx from 'classnames';
 import './index.sass';
 
@@ -64,7 +65,7 @@ class ContactAdd extends Component {
 
 	render() {
 		const {ui: {errors: {addChannel}}} = this.props;
-		const errorModificator = addChannel ? '--error' : '';
+		const errorModificator = !addChannel ? '--error' : '';
 
 		return (
 			<div className={cx({'contacts-add': true, 'contacts-add--active': this.state.active})}>
@@ -76,7 +77,7 @@ class ContactAdd extends Component {
 				</div>
 				<div className="contacts-add__form">
 					<input className={'contacts-add__input' + errorModificator} ref="input" type="text" placeholder="Enter username"/>
-					<p className={cx({'contacts-add__warning': true, 'hide': !addChannel})}>sorry, contact is not found</p>
+					<UiError classError="contacts-add__warning" nameError="addChannel"/>
 				</div>
 			</div>
 		);

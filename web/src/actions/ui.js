@@ -1,10 +1,11 @@
 import uiActionType from '../constants/ui';
 import videoStream from '../video-stream';
 
-export function setError(errorName) {
+export function setError(errorName, additional = null) {
 	return {
 		type: uiActionType.SET_ERROR,
-		errorName
+		errorName,
+		additional
 	};
 }
 

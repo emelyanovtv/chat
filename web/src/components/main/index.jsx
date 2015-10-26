@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {addMessage, fetchChannelMessages} from '../../actions/messages';
-import {deactivateVideoPanel} from '../../actions/ui';
+import {deactivateVideoPanel, setError, removeError} from '../../actions/ui';
 import Dialog from '../dialog';
 import VideoPanel from '../video-panel';
 import Input from '../input';
@@ -28,7 +28,7 @@ class Main extends Component {
 
 	render() {
 		const {dispatch, user, channels, messages, ui, anonym} = this.props;
-		const boundActions = bindActionCreators({addMessage}, dispatch);
+		const boundActions = bindActionCreators({addMessage, setError, removeError}, dispatch);
 		let encrypted = false;
 		if (channels.current !== null && channels.contacts[channels.current] !== undefined) {
 			encrypted = channels.contacts[channels.current].encrypted;
