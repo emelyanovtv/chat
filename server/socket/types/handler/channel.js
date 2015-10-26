@@ -86,7 +86,7 @@ var Channels = inherit({
 						} else {
 							throw new Error('User not found');
 						}
-						return models.Channel.findOrCreate('user', socket.handshake.user._id.toString(), toUser._id.toString());
+						return models.Channel.findOrCreate('user', socket.handshake.user._id, toUser._id);
 					})
 					.then(channel => {
 						var promises = [];
