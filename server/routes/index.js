@@ -18,6 +18,7 @@ module.exports = function(app) {
 		});
 	});
 	app.post('/login', function(req, res) {
+
 		passport.authenticate('local', {session: true}, function(err, user) {
 			if (req.xhr) {
 				if (err) {
@@ -29,6 +30,13 @@ module.exports = function(app) {
 						return res.json({error: err});
 					}
 					res.json({ error: null });
+				});
+			} else {
+				if (err)   { return res.redirect('/login'); }
+				if (!user) { return res.redirect('/login'); }
+				req.login(user, {}, function(err) {
+					if (err) { return res.redirect('/login'); }
+					return res.redirect('/');
 				});
 			}
 		})(req, res);

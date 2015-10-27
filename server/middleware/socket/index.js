@@ -16,6 +16,7 @@ module.exports.loadSession = function loadSession(socket, next) {
 			next(err);
 		}
 		socket.handshake.session = session;
+		socket.handshake.sessionID = sid;
 		next();
 	});
 };
