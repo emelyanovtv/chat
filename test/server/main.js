@@ -10,29 +10,25 @@ describe('Client work with server', function() {
 	var eventsCall = {
 		ADD_CHANNEL: {
 			client: 'c.channel.add',
-			server: 's.channel.add',
-			error: 's.server.error.c.channel.add'
+			server: 's.channel.add'
 		},
 		GET_DATA: {
 			client: 'c.user.get_data',
-			server: 's.user.set_data',
-			error: 's.server.error.c.user.get_data'
+			server: 's.user.set_data'
 		},
 		JOIN_CHANNEL: {
 			client: 'c.channel.join',
-			server: 's.channel.join',
-			error: 's.server.error.c.channel.join'
+			server: 's.channel.join'
 		},
 		SEND_MESSAGE: {
 			client: 'c.user.send_message',
-			server: 's.user.send_message',
-			error: 's.server.error.c.user.send_message'
+			server: 's.user.send_message'
 		},
 		GET_MESSAGE: {
 			client: 'c.user.get_message_by_room',
-			server: 's.user.message_by_room',
-			error: 's.server.error.c.user.get_message_by_room'
-		}
+			server: 's.user.message_by_room'
+		},
+		ERROR: 's.server.error'
 
 	};
 	var serverUrl = 'http://localhost:3000'; // урл к которому будет подключатся созданный пользователь по сокету
@@ -118,6 +114,18 @@ describe('Client work with server', function() {
 			});
 	});
 
+	beforeEach(function() {
+		client = io(serverUrl, {
+			path: '/socket.io-client',
+			transports: ['websocket'],
+			'force new connection': true
+		});
+	});
+
+	afterEach(function() {
+		client.disconnect();
+	});
+
 	after(function(done) {
 		user.remove()
 			.then(function() {
@@ -166,7 +174,7 @@ describe('Client work with server', function() {
 		agent
 			.get('/')
 			.set('cookie', cookie)
-			.end(function (err, res) {
+			.end(function(err, res) {
 				res.should.have.property('statusCode', 200);
 				cookie = res.request.cookies;
 				done();
@@ -226,26 +234,11 @@ describe('Client work with server', function() {
 	});
 
 	/**
-	 * Проверем, что авторизованный пользователь может пройти весь middleware
-	 * и подключиться к socket-серверу
-	 */
-	it('should connect login user to socket', function(done) {
-		client = io(serverUrl, {
-			path: '/socket.io-client',
-			transports: ['websocket'],
-			'force new connection': true
-		});
-		client.on('connect', function() {
-			done();
-		});
-	});
-
-	/**
 	 * Проверяем, что если отправить некорректные данные
 	 * при добавлении канала, то обработчик вызван не будет
 	 */
 	it('should server error on c.channel.add', function(done) {
-		client.on(eventsCall.ADD_CHANNEL.error, function handler(data) {
+		client.on(eventsCall.ERROR, function handler(data) {
 			data.event.should.equal(eventsCall.ADD_CHANNEL.client);
 			done();
 		});
@@ -277,22 +270,10 @@ describe('Client work with server', function() {
 	});
 
 	/**
-	 * Проверяем, что если отправить некорректные данные
-	 * при переключении канала, то обработчик вызван не будет
-	 */
-	it('should server error change channel', function(done) {
-		client.on(eventsCall.JOIN_CHANNEL.error, function(data) {
-			data.event.should.equal(eventsCall.JOIN_CHANNEL.client);
-			done();
-		});
-		client.emit(eventsCall.JOIN_CHANNEL.client, {});
-	});
-
-	/**
 	 * пользоваетель может переключаться по каналам
 	 * и сервер корректно обрабатывает данные
 	 */
-	it('should change channel', function(done) {
+	it('should change channel withou error', function(done) {
 		client.on(eventsCall.JOIN_CHANNEL.server, function(data) {
 			data.channel.should.equal(channel);
 			done();
@@ -306,7 +287,7 @@ describe('Client work with server', function() {
 	 */
 	it('message not send error', function(done) {
 		var mess = {message_type: 'text', channelId: channel, text: textMessage};
-		client.on(eventsCall.SEND_MESSAGE.error, function(data) {
+		client.on(eventsCall.ERROR, function(data) {
 			data.event.should.equal(eventsCall.SEND_MESSAGE.client);
 			done();
 		});
@@ -332,7 +313,7 @@ describe('Client work with server', function() {
 	 * для полученя сообщений
 	 */
 	it('should error on get messages by channel', function(done) {
-		client.on(eventsCall.GET_MESSAGE.error, function(data) {
+		client.on(eventsCall.ERROR, function(data) {
 			data.event.should.equal(eventsCall.GET_MESSAGE.client);
 			done();
 		});

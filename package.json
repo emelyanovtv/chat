@@ -8,7 +8,7 @@
     "server:dev": "NODE_ENV=develop DEBUG=socket.io* node app.js",
     "server:prod": "NODE_ENV=production node app.js",
     "clean": "rm -rf web/build",
-    "test:server": "mocha --recursive ./test/server",
+    "test:server": "env TEST=TRUE mocha --recursive ./test/server",
     "test:web": "mocha --compilers js:babel/register,sass:./test/sass-compiler.js --recursive ./test/web",
     "build": "npm run clean && gulp --gulpfile web/gulpfile.js build",
     "lint": "eslint ./**/*.{js,jsx} --ignore-path .gitignore",

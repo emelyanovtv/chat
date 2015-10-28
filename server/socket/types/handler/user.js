@@ -113,7 +113,7 @@ var User = inherit({
 				if (notError === true) {
 					handler.callback.apply(_this, args);
 				} else {
-					_this._socket.emit('s.server.error.' + handler.name, {event: handler.name, error: notError});
+					_this._socket.emit('s.server.error', {event: handler.name, error: notError});
 				}
 			});
 		});
