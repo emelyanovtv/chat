@@ -153,7 +153,7 @@ var Channels = inherit({
 	/*
 	 * Функция для проверки фходящих данных
 	 * является вильтом
-	 * @return {Bool}
+	 * @return {Bool | Object}
 	 */
 	_dataIsCorrect: function(event, data) {
 		var mustKeys;
