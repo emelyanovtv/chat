@@ -77,3 +77,4 @@ server.listen(port, () => log.info('Express server listening on port ' + port));
 
 const io = require('./socket')(server);
 app.set('io', io);
+module.exports = server;

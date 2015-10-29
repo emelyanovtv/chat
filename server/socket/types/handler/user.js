@@ -129,8 +129,6 @@ var User = inherit({
 				manager.sendStatus('s.user.send_private', this._socket.handshake.user._id, toUser, {message_count: 1});
 			} else {
 				models.Message.update({_id: message._id}, { $push: { read: toUser.user } }, function(err, message) {
-					console.log(err);
-					console.log(message);
 				});
 			}
 		}

@@ -111,7 +111,6 @@ var Channels = inherit({
 					})
 					.catch(function(err) {
 						socket.emit('s.channel.add', null);
-						console.log(err);
 					});
 			}
 		}
